@@ -67,7 +67,8 @@ exports.verifyOTP = async (req, res) => {
             message: 'Verification successful',
             userId: user._id,
             isProfileComplete: user.isProfileComplete,
-            redirectTo: user.isProfileComplete ? 'index.html' : 'profile.html'
+            // Change these to the folder paths
+            redirectTo: user.isProfileComplete ? '/' : '/profile' 
         });
     } catch (error) {
         res.status(500).json({ message: 'Verification error', error: error.message });
