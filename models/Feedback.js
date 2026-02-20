@@ -10,6 +10,7 @@ const feedbackSchema = new mongoose.Schema({
     enrollmentDate: { type: String }, // Keeping as string for flexibility, or Date if strict
     rating: { type: Number, required: true, min: 1, max: 5 },
     feedback: { type: String, required: true },
+    status: { type: String, enum: ['pending', 'approved', 'declined'], default: 'pending' },
     createdAt: { type: Date, default: Date.now }
 });
 

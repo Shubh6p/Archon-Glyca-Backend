@@ -1,4 +1,4 @@
-const Booking = require('../models/Booking'); 
+const Booking = require('../models/Booking');
 const User = require('../models/User');
 const nodemailer = require('nodemailer');
 
@@ -11,8 +11,8 @@ exports.bookSession = async (req, res) => {
             throw new Error("Missing Email Configuration in .env");
         }
 
-        const booking = new Booking({ 
-            userId, fullName, whatsappNumber, appointmentRegarding, preferredLanguage, date 
+        const booking = new Booking({
+            userId, fullName, whatsappNumber, appointmentRegarding, preferredLanguage, date
         });
         await booking.save();
 
@@ -23,9 +23,9 @@ exports.bookSession = async (req, res) => {
 
         const transporter = nodemailer.createTransport({
             service: 'gmail',
-            auth: { 
-                user: process.env.EMAIL_USER, 
-                pass: process.env.EMAIL_PASS 
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
 
@@ -197,5 +197,16 @@ exports.getOccupiedSlots = async (req, res) => {
         res.status(200).json(appointments.map(a => a.timeSlot));
     } catch (error) {
         res.status(500).json({ message: 'Error fetching slots', error: error.message });
+    }
+};
+
+// --- 03: Admin: Fetch All Bookings ---
+exports.getAllBookings = async (req, res) => {
+    try {
+        const bookings = await Booking.find().sort({ createdAt: -1 });
+        res.status(200).json(bookings);
+    } catch (error) {
+        console.error("Get All Bookings Error:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };

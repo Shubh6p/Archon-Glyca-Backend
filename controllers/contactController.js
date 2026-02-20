@@ -154,3 +154,14 @@ exports.sendContactMessage = async (req, res) => {
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
+
+// Admin: Get all contacts
+exports.getAllContacts = async (req, res) => {
+    try {
+        const contacts = await Contact.find().sort({ createdAt: -1 });
+        res.status(200).json(contacts);
+    } catch (error) {
+        console.error("Get All Contacts Error:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};

@@ -3,6 +3,21 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const rateLimit = require('express-rate-limit');
+
+// --- Firewall (Rate Limiting) ---
+const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    message: { message: 'Too many requests, please try again later.' }
+});
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 10,
+    message: { message: 'Too many login attempts. Please wait 15 minutes.' }
+});
+
 
 // Import Route Handlers
 const authRoutes = require('./routes/auth');
@@ -12,6 +27,7 @@ const feedbackRoutes = require('./routes/feedback');
 
 
 const app = express();
+app.use(generalLimiter);
 
 // --- Middleware Configuration ---
 app.use(express.json()); // Parses incoming JSON payloads
@@ -31,7 +47,7 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // --- API Route Definitions ---
 // Authentication: Handles OTP requesting and verification logic
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authLimiter, authRoutes);
 
 // User Management: Handles bio-data saving and profile status checks
 app.use('/api/user', userRoutes);

@@ -113,3 +113,48 @@ exports.submitFeedback = async (req, res) => {
         res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
+
+// Public: Get all approved feedback
+exports.getApprovedFeedback = async (req, res) => {
+    try {
+        const approvedFeedback = await Feedback.find({ status: 'approved' }).sort({ createdAt: -1 });
+        res.status(200).json(approvedFeedback);
+    } catch (error) {
+        console.error("Get Approved Feedback Error:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};
+
+// Admin: Get all feedback
+exports.getAllFeedback = async (req, res) => {
+    try {
+        // In a real app, middleware would check for admin email here
+        const allFeedback = await Feedback.find().sort({ createdAt: -1 });
+        res.status(200).json(allFeedback);
+    } catch (error) {
+        console.error("Get All Feedback Error:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};
+
+// Admin: Update feedback status
+exports.updateFeedbackStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        if (!['approved', 'declined', 'pending'].includes(status)) {
+            return res.status(400).json({ message: 'Invalid status' });
+        }
+
+        const updatedFeedback = await Feedback.findByIdAndUpdate(id, { status }, { new: true });
+        if (!updatedFeedback) {
+            return res.status(404).json({ message: 'Feedback not found' });
+        }
+
+        res.status(200).json({ message: `Feedback status updated to ${status}`, data: updatedFeedback });
+    } catch (error) {
+        console.error("Update Feedback Status Error:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};
